@@ -71,7 +71,6 @@ app.use(morgan('combined', { stream: logger.stream }));
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/bookings', require('./routes/bookingRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
-app.use('/api/branding', require('./routes/brandingRoutes')); 
 app.use('/api/reports', require('./routes/reportRoutes'));
 app.use('/api/search', require('./routes/searchRoutes'));
 app.use('/api/staff', require('./routes/staffRoutes'));
