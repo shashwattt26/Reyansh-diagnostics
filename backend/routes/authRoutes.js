@@ -98,10 +98,10 @@ router.post('/login', loginLimiter, validateLogin, async (req, res) => {
 
     // 4. --- PLACE THE NEW SECURE LINES HERE ---
     res.cookie('token', token, {
-      httpOnly: true, // 🛡️ Crucial: JS cannot read this cookie (Prevents XSS)
-      secure: process.env.NODE_ENV === 'production', // 🛡️ Only send over HTTPS in production
-      sameSite: 'strict', // 🛡️ Prevents CSRF attacks
-      maxAge: 60 * 60 * 1000 // 1 hour (matches JWT expiry)
+      httpOnly: true,
+      secure: true, // MUST be true for cross-domain cookies
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' allows cross-domain on Vercel/Render
+      maxAge: 60 * 60 * 1000
     });
 
     // 5. Send the success response with the token
