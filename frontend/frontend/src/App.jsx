@@ -15,6 +15,7 @@ import CookiePolicy from './pages/legal/CookiePolicy';
 import PrivacyPolicy from './pages/legal/PrivacyPolicy';
 import TermsAndConditions from './pages/legal/TermsAndCond';
 import ResetPassword from './pages/ResetPassword';
+import VerifyEmail from './pages/VerifyEmail';
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
         ========================================== */}
         <Route path="/staff-login" element={<AdminLogin />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/verify-email/:token" element={<VerifyEmail />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/staff" element={<StaffManagement />} />
       </Routes>

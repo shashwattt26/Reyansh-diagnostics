@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const db = require('../config/db');
 const { loginLimiter, registerLimiter } = require('../middleware/rateLimiter');
 const sendEmail = require('../utils/sendEmail');
+const crypto = require('crypto');
 const router = express.Router();
 const { 
   validateLogin, 
@@ -217,6 +218,39 @@ router.post('/reset-password/:token', validateResetPassword, async (req, res) =>
     res.json({ success: true, message: 'Password has been successfully reset.' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Password reset failed.' });
+  }
+});
+
+// -----------------------------------------
+// VERIFY EMAIL ROUTE
+// -----------------------------------------
+router.get('/verify-email/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    // 1. Find the staff member with this token
+    const result = await pool.query(
+      'SELECT * FROM staff WHERE verification_token = $1',
+      [token]
+    );
+
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.status(400).json({ success: false, message: 'Invalid or expired verification token.' });
+    }
+
+    // 2. Mark as verified and delete the token so it can't be used again
+    await pool.query(
+      'UPDATE staff SET is_verified = true, verification_token = NULL WHERE id = $1',
+      [user.id]
+    );
+
+    res.json({ success: true, message: 'Email successfully verified! You can now log in.' });
+
+  } catch (error) {
+    logger.error(`Verification Error: ${error.message}`);
+    res.status(500).json({ success: false, message: 'Server error during verification.' });
   }
 });
 
