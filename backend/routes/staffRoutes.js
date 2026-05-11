@@ -4,6 +4,7 @@ const db = require('../config/db');
 const { protect } = require('../middleware/authMiddleware');
 const bcrypt = require('bcrypt');
 const { validateStaffAdd, validateStaffUpdate } = require('../middleware/validator');
+const sendEmail = require('../utils/sendEmail');
 
 
 /**
@@ -84,23 +85,78 @@ router.patch('/:id', protect, validateStaffUpdate, async (req, res) => {
  * @desc    Admin onboarding a new staff member
  * @access  Private/Admin
  */
-router.post('/add', protect, validateStaffAdd, async (req, res) => {
-  if (req.user.role !== 'admin') return res.status(403).json({ message: 'Unauthorized' });
-  
+router.post('/add', async (req, res) => {
   const { name, email, password, role } = req.body;
-  
-  // 🛡️ Ensure uniform high-security hashing across the entire app
-  const saltRounds = 12; 
-  const hashedPassword = await bcrypt.hash(password, saltRounds);
 
   try {
+    // 1. Check if email already exists
+    const existingUser = await db.query('SELECT * FROM staff WHERE email = $1', [email]);
+    if (existingUser.rows.length > 0) {
+      return res.status(400).json({ success: false, message: 'Email is already in use.' });
+    }
+
+    // 2. Hash the default password
+    const saltRounds = 12;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // 3. Generate a secure verification token
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+
+    // 4. Insert into database (defaults to is_verified = false based on our previous setup)
     const result = await db.query(
-      'INSERT INTO staff (name, email, password_hash, role, is_active) VALUES ($1, $2, $3, $4, true) RETURNING id, name, email, role, is_active',
-      [name, email, hashedPassword, role]
+      `INSERT INTO staff (name, email, password_hash, role, verification_token, is_verified, is_active) 
+       VALUES ($1, $2, $3, $4, $5, false, true) RETURNING id, name, email, role, is_active`,
+      [name, email, hashedPassword, role, verificationToken]
     );
-    res.status(201).json({ success: true, data: result.rows[0] });
+
+    const newStaff = result.rows[0];
+
+    // 5. Construct the secure Vercel frontend URL
+    const frontendUrl = process.env.FRONTEND_URL || 'https://reyanshdiagnostics.com';
+    const verifyUrl = `${frontendUrl}/verify-email/${verificationToken}`;
+
+    // 6. Send the verification email using Resend
+    const message = `
+      Hello ${name},
+
+      An administrator at Reyansh Diagnostics has created an account for you.
+      
+      Your Role: ${role.toUpperCase()}
+      Your Default Password: ${password}
+      
+      Please verify your email address to activate your account and log in by clicking the link below:
+      ${verifyUrl}
+      
+      (Please change your password after logging in).
+    `;
+
+    try {
+      await sendEmail({
+        email: email, 
+        subject: 'Welcome to Reyansh Diagnostics - Verify Your Account',
+        message: message,
+      });
+      
+      // Send success response to the frontend table
+      res.status(201).json({ 
+        success: true, 
+        message: 'Staff added and verification email sent.',
+        data: newStaff
+      });
+
+    } catch (emailErr) {
+      console.error('Email failed to send:', emailErr);
+      // Even if email fails, the user was created, so we return success but warn the admin
+      res.status(201).json({ 
+        success: true, 
+        message: 'Staff added, but the verification email failed to send.',
+        data: newStaff
+      });
+    }
+
   } catch (error) {
-    res.status(500).json({ message: 'Email already exists or database error.' });
+    console.error('Add Staff Error:', error);
+    res.status(500).json({ success: false, message: 'Server error while adding staff.' });
   }
 });
 

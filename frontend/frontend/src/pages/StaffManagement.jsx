@@ -25,7 +25,8 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Snackbar
 } from '@mui/material';
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -54,6 +55,20 @@ export default function StaffManagement() {
     password: '',
     role: 'staff'
   });
+
+  // SNACKBAR NOTIFICATION STATE
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success' // 'success' | 'error' | 'info' | 'warning'
+  });
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   // FETCH STAFF
   useEffect(() => {
@@ -183,6 +198,14 @@ export default function StaffManagement() {
           password: '',
           role: 'staff'
         });
+
+        // 🚀 SHOW SUCCESS MESSAGE
+        setSnackbar({
+          open: true,
+          message: response.data.message || 'Verification email sent successfully!',
+          severity: 'success'
+        });
+
       } else {
         alert('Failed to create account.');
       }
@@ -564,6 +587,22 @@ export default function StaffManagement() {
           </DialogActions>
         </form>
       </Dialog>
+      {/* 🚀 THE SUCCESS POPUP NOTIFICATION */}
+      <Snackbar 
+        open={snackbar.open} 
+        autoHideDuration={5000} // Disappears after 5 seconds
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} // Pops up at the bottom center
+      >
+        <Alert 
+          onClose={handleCloseSnackbar} 
+          severity={snackbar.severity} 
+          variant="filled" // Makes the colors solid and vibrant
+          sx={{ width: '100%', fontWeight: 'bold' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
