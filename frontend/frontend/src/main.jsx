@@ -4,7 +4,6 @@ import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import App from './App';
 import axios from 'axios';
-import { HelmetProvider } from 'react-helmet-async';
 
 axios.defaults.withCredentials = true;
 

@@ -13,7 +13,7 @@ import AboutPage from './pages/AboutPage';
 import ScrollToTop from './components/ScrollToTop';
 import CookiePolicy from './pages/legal/CookiePolicy';
 import PrivacyPolicy from './pages/legal/PrivacyPolicy';
-import TermsAndConditions from './pages/legal/Terms&Cond';
+import TermsAndConditions from './pages/legal/TermsAndCond';
 import ResetPassword from './pages/ResetPassword';
 
 function App() {
