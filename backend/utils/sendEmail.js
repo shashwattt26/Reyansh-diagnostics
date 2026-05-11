@@ -1,5 +1,6 @@
 // utils/sendEmail.js
 const nodemailer = require('nodemailer');
+const dns = require('dns');
 
 dns.setDefaultResultOrder('ipv4first');
 
