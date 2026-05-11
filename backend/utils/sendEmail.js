@@ -8,8 +8,8 @@ const sendEmail = async (options) => {
   // 1. Create a transporter
   const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
+    port: 587,
+    secure: false,
     family: 4, // Force IPv4
     auth: {
       user: process.env.EMAIL_USER,
