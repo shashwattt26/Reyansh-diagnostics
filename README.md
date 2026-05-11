@@ -1,12 +1,3 @@
-Creating a comprehensive, professional `README.md` is the perfect way to cap off all the hard work you've put into this project. It serves as the "front page" of your GitHub repository, telling other developers (and future employers) exactly what this application is, what technologies it uses, and how to run it.
-
-Here is a complete, polished README template tailored specifically to the architecture, security features, and testing suites we've built together.
-
-You can copy this block directly into a new file named `README.md` in the root of your project:
-
----
-
-```markdown
 # 🏥 Diagnostic Center Portal
 
 A secure, full-stack web application designed for diagnostic centers and pathology labs. This portal allows patients to easily book diagnostic tests and securely download their medical reports, while providing a protected dashboard for staff and administrators to manage lab operations.
@@ -151,18 +142,3 @@ npm test
 * **Password Hashing:** Strict `bcrypt` hashing (12 salt rounds) for all staff accounts.
 * **Automated Dependency Scanning:** GitHub Dependabot configured for weekly security audits.
 
-```
-
-***
-
-### How to use this:
-1. In the root of your project folder (where your `.github` folder is), create a new file named `README.md`.
-2. Paste the text above into it.
-3. Replace the placeholder URL in the "Clone the Repository" section with your actual GitHub URL.
-4. Save it, commit it, and push it to GitHub:
-   ```bash
-   git add README.md
-   git commit -m "Add project README"
-   git push origin main
-
-```
