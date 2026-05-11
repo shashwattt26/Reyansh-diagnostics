@@ -166,27 +166,6 @@ router.post('/forgot-password', validateForgotPassword, async (req, res) => {
   }
 });
 
-// --- 4. COMPLETE EMAIL VERIFICATION ---
-router.get('/verify/:token', async (req, res) => {
-  try {
-    const { token } = req.params;
-    
-    // Find user by verification token and update status
-    const result = await db.query(
-      'UPDATE staff SET is_verified = true, verification_token = NULL WHERE verification_token = $1 RETURNING id',
-      [token]
-    );
-
-    if (result.rowCount === 0) {
-      return res.status(400).json({ success: false, message: 'Invalid or expired verification token.' });
-    }
-
-    res.json({ success: true, message: 'Email verified successfully. You can now log in.' });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Verification failed.' });
-  }
-});
-
 // --- 5. COMPLETE PASSWORD RESET ---
 router.post('/reset-password/:token', validateResetPassword, async (req, res) => {
   const { token } = req.params;

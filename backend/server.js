@@ -1,3 +1,6 @@
+require('dns').setDefaultResultOrder('ipv4first');
+
+
 const express = require('express');
 const http = require('http'); // Built-in Node module
 const { Server } = require('socket.io'); // Import Socket.io
