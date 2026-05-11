@@ -1,144 +1,133 @@
-# 🏥 Diagnostic Center Portal
+# Reyansh Imaging & Diagnostics Center 🏥
 
-A secure, full-stack web application designed for diagnostic centers and pathology labs. This portal allows patients to easily book diagnostic tests and securely download their medical reports, while providing a protected dashboard for staff and administrators to manage lab operations.
+A secure, full-stack web application designed to manage diagnostic center operations, patient bookings, staff directory access, and secure medical report delivery.
 
 ## 🚀 Tech Stack
 
 **Frontend:**
-* React.js (Bootstrapped with Vite for high performance)
-* Material-UI (MUI v6) for a responsive, accessible interface
-* React Router for client-side navigation
+* React.js (Vite)
+* Material-UI (MUI) for responsive design and components (Snackbars, Modals, Data Tables)
+* React Router DOM
 * Axios for API communication
 
 **Backend:**
 * Node.js & Express.js
-* PostgreSQL (Database connection pooling via `pg`)
-* Socket.io (Real-time notifications)
-* Cloudinary (Secure cloud storage for prescriptions and reports)
-
-**Testing & CI/CD:**
-* Backend: Jest & Supertest
-* Frontend: Vitest & React Testing Library
-* Pipeline: GitHub Actions
+* PostgreSQL (Hosted on Render Private VPC)
+* **Authentication:** JWT (JSON Web Tokens) stored securely in HTTP-Only cookies
+* **Email Service:** Resend API (for verification, password resets, and broadcasts)
+* **File Storage:** Cloudinary (for secure PDF lab reports and prescriptions)
+* **Real-time:** Socket.io for live admin notifications
 
 ---
 
-## ✨ Key Features
+## 🛡️ Key Features & Security
 
-### For Patients
-* **Seamless Booking:** Interactive UI to book diagnostic tests (X-Ray, MRI, Blood Tests, etc.).
-* **Prescription Uploads:** Securely upload doctor's prescriptions (handled via Multer & Cloudinary).
-* **Secure Report Access:** Dual-factor tracking system (Tracking Code + Registered Phone Number) to ensure medical privacy when downloading reports.
-
-### For Staff & Admins
-* **Role-Based Access Control (RBAC):** Distinct privileges for standard staff vs. administrative users.
-* **Protected Routes:** Authentication enforced via stateless JWTs stored securely in HTTP-Only cookies to prevent XSS attacks.
-* **Data Anonymization:** Admin tools to softly delete and anonymize patient Personally Identifiable Information (PII) for compliance.
+* **Robust Authentication:** * JWTs are strictly managed via HTTP-Only, Secure, SameSite cookies to prevent XSS and CSRF attacks.
+  * Passwords hashed using `bcrypt` with a high cost factor (12).
+* **Role-Based Access Control (RBAC):** * Granular permissions for `admin`, `doctor`, and `staff` roles.
+  * Admins can activate/deactivate accounts and broadcast company-wide emails.
+* **Automated Email Workflows:** * Powered by the Resend API (bypassing traditional SMTP blockers). Handles secure account verification links, password reset tokens, and admin announcements.
+* **Secure Patient Portal (IDOR Protection):** * Patients retrieve medical reports using Dual-Factor Ownership Verification (Tracking Code + Registered Phone Number) to prevent brute-force and BOLA/IDOR vulnerabilities.
+* **Rate Limiting:** Login and registration routes are protected against brute-force attacks.
 
 ---
 
 ## 🛠️ Local Development Setup
 
-### Prerequisites
-Make sure you have [Node.js](https://nodejs.org/) (v20+) and Git installed on your machine. You will also need a PostgreSQL database instance and a Cloudinary account.
-
-### 1. Clone the Repository
+### 1. Clone the repository
 ```bash
-git clone [https://github.com/your-username/diagnostic-center-portal.git](https://github.com/your-username/diagnostic-center-portal.git)
-cd diagnostic-center-portal
+git clone [https://github.com/shashwattt26/Reyansh-diagnostics.git](https://github.com/shashwattt26/Reyansh-diagnostics.git)
+cd Reyansh-diagnostics
 
 ```
 
-### 2. Environment Variables
+### 2. Backend Setup
 
-You will need to create two `.env` files (one in the backend, one in the frontend) to run this locally. Do **not** commit these to version control.
+Navigate to the backend directory and install dependencies:
 
-**Backend (`/backend/.env`)**
+```bash
+cd backend
+npm install
+
+```
+
+Create a `.env` file in the `backend` folder and add the following keys:
 
 ```env
+# Server Configuration
 PORT=5000
+FRONTEND_URL=http://localhost:5173  # Change to your custom domain in production
 NODE_ENV=development
-DATABASE_URL=postgres://user:password@localhost:5432/diagnostic_db
+
+# Database (PostgreSQL)
+DATABASE_URL=postgresql://user:password@localhost:5432/reyansh_db
+
+# Security
 JWT_SECRET=your_super_secret_jwt_key
+
+# Email API (Resend)
+RESEND_API_KEY=re_your_resend_api_key
+
+# Cloudinary (File Uploads)
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
-FRONTEND_URL=http://localhost:5173
 
 ```
 
-**Frontend (`/frontend/.env`)**
+Start the backend server:
+
+```bash
+npm run dev
+
+```
+
+### 3. Frontend Setup
+
+Open a new terminal, navigate to the frontend directory, and install dependencies:
+
+```bash
+cd frontend/frontend
+npm install
+
+```
+
+Create a `.env` file in the `frontend/frontend` folder:
 
 ```env
-VITE_API_URL=http://localhost:5000/api
+VITE_API_URL=http://localhost:5000  # Change to Render URL in production
 
 ```
 
-### 3. Install Dependencies
-
-Install packages for both the backend and frontend environments:
+Start the Vite development server:
 
 ```bash
-# Install backend dependencies
-cd backend
-npm install
-
-# Install frontend dependencies
-cd ../frontend
-npm install
-
-```
-
-### 4. Run the Application
-
-Open two terminal windows to run the servers concurrently:
-
-**Terminal 1 (Backend):**
-
-```bash
-cd backend
 npm run dev
-
-```
-
-**Terminal 2 (Frontend):**
-
-```bash
-cd frontend
-npm run dev
-
-```
-
-The frontend will be available at `http://localhost:5173`.
-
----
-
-## 🧪 Testing
-
-This project maintains a high standard of reliability with automated test suites for both the frontend UI and backend APIs. External services (like Database and Cloudinary) are fully mocked during testing.
-
-**Run Backend Tests (Jest):**
-
-```bash
-cd backend
-npm test
-
-```
-
-**Run Frontend Tests (Vitest):**
-
-```bash
-cd frontend
-npm test
 
 ```
 
 ---
 
-## 🛡️ Security Measures
+## 🌐 Deployment Details
 
-* **Rate Limiting:** Global API rate limiting to prevent brute-force and DDoS attacks.
-* **Helmet.js:** Configured to secure Express apps by setting various HTTP headers.
-* **Password Hashing:** Strict `bcrypt` hashing (12 salt rounds) for all staff accounts.
-* **Automated Dependency Scanning:** GitHub Dependabot configured for weekly security audits.
+* **Frontend Hosting:** Vercel
+* **Backend Hosting:** Render (Web Service)
+* **Database:** Render PostgreSQL (Configured securely inside a Virtual Private Cloud / Internal Network)
+* **Custom Domain:** `reyanshdiagnostics.com`
+* **Routing Note:** Vercel requires a `vercel.json` file in the frontend root to successfully route React SPA paths and prevent 404 errors on refresh.
+
+---
+
+## 📝 Recent Updates (Changelog)
+
+* **Email Migration:** Replaced Nodemailer/SMTP with Resend API to fix IPv6 routing dropouts on Render's network.
+* **CORS Configuration:** Locked down CORS policy to explicitly trust the verified custom domain.
+* **UI/UX Polish:** Replaced native browser `alert()` popups with elegant MUI Snackbars for asynchronous operations (e.g., "Staff added and verification email sent").
+* **Database Migrations:** Fixed `users` vs `staff` table routing mismatches and ensured `db.query` consistency.
+
+---
+
+## 👨‍💻 Author
+
+**Shashwat Rao** - [GitHub Profile](https://www.google.com/search?q=https://github.com/shashwattt26)
 

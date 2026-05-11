@@ -5,6 +5,7 @@ const { protect } = require('../middleware/authMiddleware');
 const bcrypt = require('bcrypt');
 const { validateStaffAdd, validateStaffUpdate } = require('../middleware/validator');
 const sendEmail = require('../utils/sendEmail');
+const crypto = require('crypto');
 
 
 /**
