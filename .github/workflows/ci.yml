@@ -1,0 +1,54 @@
+name: MERN Diagnostic Center CI
+
+# 🚀 1. TRIGGERS: When should this pipeline run?
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  # ⚙️ 2. BACKEND JOB: Run Jest Tests
+  backend-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend # Make sure this matches your backend folder name
+
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20' # Use a stable Node version
+
+    - name: 📦 Install Backend Dependencies
+      run: npm install
+
+    - name: 🧪 Run Backend Tests (Jest)
+      run: npm test
+
+
+  # 🎨 3. FRONTEND JOB: Run Vitest Tests
+  frontend-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend # Make sure this matches your frontend folder name (e.g., ./src or ./frontend)
+
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: 📦 Install Frontend Dependencies
+      run: npm install
+
+    - name: 🧪 Run Frontend Tests (Vitest)
+      run: npm test

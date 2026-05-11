@@ -1,0 +1,27 @@
+// utils/sendEmail.js
+const nodemailer = require('nodemailer');
+
+const sendEmail = async (options) => {
+  // 1. Create a transporter
+  const transporter = nodemailer.createTransport({
+    service: process.env.EMAIL_SERVICE, // e.g., 'gmail'
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  // 2. Define the email options
+  const mailOptions = {
+    from: `Reyansh Diagnostics <${process.env.EMAIL_USER}>`,
+    to: options.email,
+    subject: options.subject,
+    text: options.message,
+    // You can also use 'html: options.html' if you want to send styled emails
+  };
+
+  // 3. Actually send the email
+  await transporter.sendMail(mailOptions);
+};
+
+module.exports = sendEmail;

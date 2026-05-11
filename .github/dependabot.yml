@@ -1,0 +1,21 @@
+version: 2
+updates:
+  # Scan the Backend Node.js environment
+  - package-ecosystem: "npm"
+    directory: "/backend"
+    schedule:
+      interval: "weekly" # Can be daily or weekly
+    open-pull-requests-limit: 10
+    labels:
+      - "security"
+      - "backend"
+
+  # Scan the Frontend React environment
+  - package-ecosystem: "npm"
+    directory: "/src" # Or wherever your frontend package.json lives
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "security"
+      - "frontend"
