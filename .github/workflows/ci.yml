@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./frontend # Make sure this matches your frontend folder name (e.g., ./src or ./frontend)
+        working-directory: ./frontend/frontend
 
     steps:
     - name: 📥 Checkout Repository
