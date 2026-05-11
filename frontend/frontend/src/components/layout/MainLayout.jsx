@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Box } from '@mui/material';
-import MainNavbar from '../landing/MainNavbar';
+import MainNavbar from '../landing/MainNavBar';
 import Footer from '../landing/Footer';
 
 export default function MainLayout() {
