@@ -10,6 +10,8 @@ jest.mock('../config/db', () => ({
   end: jest.fn()
 }));
 
+process.env.JWT_SECRET = 'test-secret-key';
+
 // 🛡️ 2. MOCK THE EMAIL SENDER (Prevents actual emails from being sent)
 jest.mock('../utils/sendEmail', () => jest.fn().mockResolvedValue(true));
 

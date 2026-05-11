@@ -52,8 +52,6 @@ router.post('/register', registerLimiter, validateRegister, async (req, res) => 
       console.error(err);
       return res.status(500).json({ success: false, message: 'Registration successful, but verification email could not be sent.' });
     }
-
-    res.status(201).json({ success: true, message: 'Registration successful. Please check your email to verify your account.' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Registration failed.' });
   }
