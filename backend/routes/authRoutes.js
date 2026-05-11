@@ -36,7 +36,7 @@ router.post('/register', registerLimiter, validateRegister, async (req, res) => 
     );
 
     // Construct the verification URL
-    const verifyUrl = `http://localhost:5173/verify-email/${verificationToken}`;
+    const verifyUrl = `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`;
 
     const message = `Welcome to Reyansh Diagnostics! \n\nPlease verify your email by clicking the link below: \n\n ${verifyUrl}`;
 
@@ -139,7 +139,7 @@ router.post('/forgot-password', validateForgotPassword, async (req, res) => {
     );
 
     // Construct the reset URL (pointing to your Vite frontend)
-    const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
     const message = `You requested a password reset. \n\nPlease make a PUT request to: \n\n ${resetUrl}`;
 
