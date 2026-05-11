@@ -100,6 +100,7 @@ describe('BookingCard UI Component', () => {
       // Mock the Axios response for the search API
       axios.post.mockResolvedValueOnce({ 
         data: { 
+          success: true,
           data: { 
             patientName: 'Jane Doe', 
             status: 'Report Ready', 
@@ -127,8 +128,8 @@ describe('BookingCard UI Component', () => {
       });
 
       // Verify the download button appears with the correct link
-      const downloadButton = screen.getByRole('link', { name: /Download PDF Report/i });
+      const downloadButton = await screen.findByRole('link', { name: /Download PDF Report/i });
       expect(downloadButton).toHaveAttribute('href', 'https://cloudinary.com/fake-pdf-link.pdf');
-    });
+          });
   });
 });
