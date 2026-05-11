@@ -5,7 +5,6 @@ const crypto = require('crypto');
 const db = require('../config/db');
 const { loginLimiter, registerLimiter } = require('../middleware/rateLimiter');
 const sendEmail = require('../utils/sendEmail');
-const crypto = require('crypto');
 const router = express.Router();
 const { 
   validateLogin, 
@@ -205,7 +204,7 @@ router.post('/reset-password/:token', validateResetPassword, async (req, res) =>
       return res.status(400).json({ success: false, message: 'Password reset token is invalid or has expired.' });
     }
 
-    // Hash the new password (maintaining your existing cost factor of 12)
+    // Hash the new password
     const saltRounds = 12;
     const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
 
@@ -228,8 +227,8 @@ router.get('/verify-email/:token', async (req, res) => {
   try {
     const { token } = req.params;
 
-    // 1. Find the staff member with this token
-    const result = await pool.query(
+    // 1. Find the staff member with this token (FIXED: changed pool to db)
+    const result = await db.query(
       'SELECT * FROM staff WHERE verification_token = $1',
       [token]
     );
@@ -240,8 +239,8 @@ router.get('/verify-email/:token', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid or expired verification token.' });
     }
 
-    // 2. Mark as verified and delete the token so it can't be used again
-    await pool.query(
+    // 2. Mark as verified and delete the token (FIXED: changed pool to db)
+    await db.query(
       'UPDATE staff SET is_verified = true, verification_token = NULL WHERE id = $1',
       [user.id]
     );
