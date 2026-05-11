@@ -8,7 +8,7 @@ const sendEmail = async (options) => {
     const data = await resend.emails.send({
       // ⚠️ NOTE: While on the free tier without a custom domain, 
       // you MUST use this exact 'onboarding' email address as the sender.
-      from: 'Reyansh Diagnostics <onboarding@resend.dev>', 
+      from: 'Reyansh Diagnostics <admin@reyanshdiagnostics.com>', 
       to: options.email,
       subject: options.subject,
       text: options.message,
