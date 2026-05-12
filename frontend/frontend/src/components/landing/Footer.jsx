@@ -89,28 +89,52 @@ export default function Footer() {
             </Stack>
           </Grid>
 
-          {/* Column 4: Get In Touch */}
+{/* Column 4: Get In Touch */}
           <Grid item xs={12} md={4}>
             <Typography variant="subtitle1" fontWeight="700" gutterBottom>Get In Touch</Typography>
             <Stack spacing={2.5}>
+              
+              {/* Phone Link */}
               <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
                 <PhoneIcon color="primary" sx={{ fontSize: '1.2rem', mt: 0.3 }} />
-                <Typography variant="body2" sx={{ color: 'grey.400' }}>
+                <Link 
+                  href="tel:+917800055644" 
+                  underline="hover"
+                  variant="body2" 
+                  sx={{ color: 'grey.400', transition: '0.2s', '&:hover': { color: 'primary.main' } }}
+                >
                   +91 7800055644
-                </Typography>
+                </Link>
               </Box>
+
+              {/* Email Link */}
               <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
                 <EmailIcon color="primary" sx={{ fontSize: '1.2rem', mt: 0.3 }} />
-                <Typography variant="body2" sx={{ color: 'grey.400' }}>
+                <Link 
+                  href="mailto:reyanshdiagnostics@gmail.com" 
+                  underline="hover"
+                  variant="body2" 
+                  sx={{ color: 'grey.400', transition: '0.2s', '&:hover': { color: 'primary.main' } }}
+                >
                   reyanshdiagnostics@gmail.com
-                </Typography>
+                </Link>
               </Box>
+
+              {/* Location Map Link (Bonus) */}
               <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
                 <LocationOnIcon color="primary" sx={{ fontSize: '1.2rem', mt: 0.3 }} />
-                <Typography variant="body2" sx={{ color: 'grey.400', lineHeight: 1.6 }}>
+                <Link 
+                  href="https://maps.google.com/?q=Krishna+Nagar+colony,+SA+17/3K-4,+near+hotel+surabhi,+Paharia,+Varanasi,+UP+221007" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  underline="hover"
+                  variant="body2" 
+                  sx={{ color: 'grey.400', lineHeight: 1.6, transition: '0.2s', '&:hover': { color: 'primary.main' } }}
+                >
                   Krishna Nagar colony, SA 17/3K-4, near hotel surabhi, Paharia, Varanasi, UP 221007.
-                </Typography>
+                </Link>
               </Box>
+
             </Stack>
           </Grid>
 
