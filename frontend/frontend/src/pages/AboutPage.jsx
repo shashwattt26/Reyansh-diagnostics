@@ -58,7 +58,7 @@ export default function AboutPage() {
           <img 
             src="/logo.avif" // Replace with the actual URL/path to image_1.png
             alt="Reyansh Diagnostics Logo" 
-            style={{ width: '500px', height: 'auto', marginBottom: '24px' }}
+            style={{ width: '400px', height: 'auto', marginBottom: '24px' }}
           />
           <Typography variant="h3" component="h1" sx={{ fontWeight: 800, color: '#111827', letterSpacing: '-0.02em', mb: 2 }}>
             Reyansh Imaging & Diagnostics
