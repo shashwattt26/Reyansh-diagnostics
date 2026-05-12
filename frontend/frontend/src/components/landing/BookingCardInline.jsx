@@ -214,8 +214,13 @@ export default function InlineBookingCard() {
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <TextField size="small" fullWidth required label="Mobile Number" variant="outlined" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    <TextField size="small" fullWidth required label="Mobile Number" variant="outlined" value={formData.phone} onChange={(e) => {
+                      // 🛡️ Only allow numbers
+                      const onlyNums = e.target.value.replace(/[^0-9]/g, '');
+                      setFormData({...formData, phone: onlyNums});
+                    }}
                       slotProps={{ input: { startAdornment: <InputAdornment position="start"><PhoneIcon sx={{ color: '#9ca3af', fontSize: 20 }} /></InputAdornment> }}}
+                      inputProps={{ maxLength: 10 }}
                     />
                   </Grid>
                   <Grid item xs={12}>
@@ -264,9 +269,14 @@ export default function InlineBookingCard() {
               />
 
               {/* 🛡️ NEW: Phone Number Input for Dual-Factor Authentication */}
-              <TextField size="small" fullWidth required label="Registered Mobile Number" variant="outlined" type="tel" value={searchPhone} onChange={(e) => setSearchPhone(e.target.value)}
+              <TextField size="small" fullWidth required label="Registered Mobile Number" variant="outlined" type="tel" value={searchPhone} onChange={(e) => {
+                // 🛡️ Only allow numbers
+                const onlyNums = e.target.value.replace(/[^0-9]/g, '');
+                setSearchPhone(onlyNums);
+              }}
                 slotProps={{ input: { startAdornment: <InputAdornment position="start"><PhoneIcon sx={{ color: '#0d6efd', fontSize: 20 }} /></InputAdornment> }}}
                 sx={{ mt: 2, '& .MuiOutlinedInput-root': { letterSpacing: 1 } }}
+                inputProps={{ maxLength: 10 }}
               />
               
               <Button type="submit" variant="contained" fullWidth disabled={reportLoading || !searchCode || !searchPhone} sx={{ mt: 2.5, py: 1.25, bgcolor: '#111827', fontWeight: 700, fontSize: '1rem', borderRadius: '50px', boxShadow: 'none', '&:hover': { bgcolor: '#000000', boxShadow: '0 4px 14px rgba(0, 0, 0, 0.3)' } }}>

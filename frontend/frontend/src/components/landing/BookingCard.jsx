@@ -199,7 +199,7 @@ export default function BookingCard() {
                       Next Steps
                     </Typography>
                     <Typography variant="body2" color="#92400e" sx={{ mb: 1.5, lineHeight: 1.6 }}>
-                      Please visit our center for sample collection or required tests during our operating hours:
+                      Please visit our center for required tests during our operating hours:
                     </Typography>
                     
                     <Stack spacing={0.5} sx={{ mb: 1.5 }}>
@@ -255,8 +255,13 @@ export default function BookingCard() {
                       />
                     </Grid>
                     <Grid size={{ xs:12 }}>
-                      <TextField fullWidth required label="Mobile Number" variant="outlined" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                      <TextField fullWidth required label="Mobile Number" variant="outlined" value={formData.phone} onChange={(e) => {
+                          // 🛡️ Only allow numbers
+                          const onlyNums = e.target.value.replace(/[^0-9]/g, '');
+                          setSearchPhone(onlyNums);
+                        }}
                         slotProps={{ input: { startAdornment: <InputAdornment position="start"><PhoneIcon sx={{ color: '#9ca3af' }} /></InputAdornment> }}}
+                        inputProps={{ maxLength: 10 }}
                       />
                     </Grid>
                     <Grid size={{ xs:12 }}>
@@ -305,9 +310,14 @@ export default function BookingCard() {
                 />
 
                 {/* 🛡️ NEW: Phone Number Input for Dual-Factor Authentication */}
-                <TextField fullWidth required label="Registered Phone Number" variant="outlined" type="tel" value={searchPhone} onChange={(e) => setSearchPhone(e.target.value)}
+                <TextField fullWidth required label="Registered Phone Number" variant="outlined" type="tel" value={searchPhone} onChange={(e) => {
+                    // 🛡️ Only allow numbers
+                    const onlyNums = e.target.value.replace(/[^0-9]/g, '');
+                    setSearchPhone(onlyNums);
+                  }}
                   InputProps={{ startAdornment: <InputAdornment position="start"><PhoneIcon sx={{ color: '#0d6efd' }} /></InputAdornment> }}
                   sx={{ mt: 2, '& .MuiOutlinedInput-root': { fontSize: '1.1rem', letterSpacing: 1 } }}
+                  inputProps={{ maxLength: 10 }}
                 />
                 
                 <Button 
