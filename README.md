@@ -1,10 +1,8 @@
----
-
 # 🏥 Reyansh Imaging & Diagnostics Center
 
 > A secure, full-stack web application designed to manage diagnostic center operations, patient bookings, staff directory access, and secure medical report delivery.
 
----
+
 
 ## 📑 Table of Contents
 
