@@ -60,6 +60,11 @@ router.post('/upload-prescription', upload.single('prescription'), validateBooki
   } catch (err) {
     console.error('Booking Upload Error:', err);
     res.status(500).json({ success: false, message: 'Server error during booking.' });
+  } finally {
+    // 🛡️ MEMORY LEAK FIX: This always runs, even if Cloudinary or the Database crashes!
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
   }
 });
 

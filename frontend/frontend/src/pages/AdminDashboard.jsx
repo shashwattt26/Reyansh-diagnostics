@@ -195,7 +195,7 @@ export default function AdminDashboard() {
   };
 
   // --- Filter & Search Logic ---
-  const filteredBookings = bookings.filter((booking) => {
+    const filteredBookings = bookings.filter((booking) => {
     const currentStatus = booking.status || 'Pending Review';
     const matchesStatus = statusFilter === 'All' || currentStatus === statusFilter;
     const query = searchQuery.toLowerCase();
@@ -292,15 +292,19 @@ export default function AdminDashboard() {
                     <TableCell>
                       {/* Flexbox for Action buttons to keep them aligned cleanly */}
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Button 
-                          variant="contained" size="small" onClick={() => openUploadModal(booking)}
-                          disabled={booking.status === 'Report Ready'}
-                          sx={{ bgcolor: booking.status === 'Report Ready' ? 'grey.400' : 'primary.main', whiteSpace: 'nowrap' }}
-                        >
-                          {booking.status === 'Report Ready' ? 'Report Sent' : 'Process Report'}
-                        </Button>
                         
-                        {/* Only Admins should be allowed to delete data */}
+                        {/* 🛡️ RECEPTIONIST BLOCK: Only show "Process Report" if they are NOT a receptionist */}
+                        {userRole !== 'receptionist' && (
+                          <Button 
+                            variant="contained" size="small" onClick={() => openUploadModal(booking)}
+                            disabled={booking.status === 'Report Ready'}
+                            sx={{ bgcolor: booking.status === 'Report Ready' ? 'grey.400' : 'primary.main', whiteSpace: 'nowrap' }}
+                          >
+                            {booking.status === 'Report Ready' ? 'Report Sent' : 'Process Report'}
+                          </Button>
+                        )}
+                        
+                        {/* 🛡️ ADMIN BLOCK: Only Admins should be allowed to delete/anonymize data */}
                         {userRole === 'admin' && (
                           <Tooltip title="Anonymize Patient Data">
                             <IconButton color="error" size="small" onClick={() => triggerAnonymizeModal(booking)}>
@@ -308,6 +312,7 @@ export default function AdminDashboard() {
                             </IconButton>
                           </Tooltip>
                         )}
+
                       </Box>
                     </TableCell>
                   </TableRow>

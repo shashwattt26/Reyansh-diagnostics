@@ -26,11 +26,14 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Snackbar
+  Snackbar,
+  IconButton,
+  Tooltip
 } from '@mui/material';
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import axios from 'axios';
 
@@ -68,6 +71,44 @@ export default function StaffManagement() {
       return;
     }
     setSnackbar({ ...snackbar, open: false });
+  };
+
+  // DELETE STAFF STATE
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [staffToDelete, setStaffToDelete] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const handleDeleteClick = (staff) => {
+    setStaffToDelete(staff);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!staffToDelete) return;
+    setDeleteLoading(true);
+
+    try {
+      const response = await axios.delete(`${BACKEND_URL}/api/staff/${staffToDelete.id}`, {
+        withCredentials: true
+      });
+
+      if (response.data.success) {
+        // Remove staff from UI instantly
+        setStaffList(prev => prev.filter(s => s.id !== staffToDelete.id));
+        setSnackbar({ open: true, message: 'Staff member deleted successfully.', severity: 'success' });
+      }
+    } catch (err) {
+      console.error('Delete Staff Error:', err);
+      setSnackbar({ 
+        open: true, 
+        message: err.response?.data?.message || 'Failed to delete staff member.', 
+        severity: 'error' 
+      });
+    } finally {
+      setDeleteLoading(false);
+      setDeleteDialogOpen(false);
+      setStaffToDelete(null);
+    }
   };
 
   // FETCH STAFF
@@ -427,28 +468,24 @@ export default function StaffManagement() {
                     </TableCell>
 
                     <TableCell align="center">
-                      <Switch
-                        checked={
-                          staff.is_active
-                        }
-                        onChange={() =>
-                          handleStatusToggle(
-                            staff.id,
-                            staff.is_active
-                          )
-                        }
-                        color="success"
-                        disabled={
-                          toggleLoading ===
-                          staff.id
-                        }
-                        slotProps={{
-                          input: {
-                            'aria-label':
-                              'staff-status-toggle'
-                          }
-                        }}
-                      />
+                      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
+                        <Switch
+                          checked={staff.is_active}
+                          onChange={() => handleStatusToggle(staff.id, staff.is_active)}
+                          color="success"
+                          disabled={toggleLoading === staff.id}
+                        />
+                        <Tooltip title="Delete Staff">
+                          <IconButton 
+                            color="error" 
+                            size="small" 
+                            onClick={() => handleDeleteClick(staff)}
+                            disabled={toggleLoading === staff.id || deleteLoading}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ))
@@ -535,24 +572,12 @@ export default function StaffManagement() {
               <Select
                 value={newStaff.role}
                 label="Role"
-                onChange={e =>
-                  setNewStaff({
-                    ...newStaff,
-                    role: e.target.value
-                  })
-                }
+                onChange={e => setNewStaff({ ...newStaff, role: e.target.value })}
               >
-                <MenuItem value="staff">
-                  Lab Technician
-                </MenuItem>
-
-                <MenuItem value="doctor">
-                  Doctor / Pathologist
-                </MenuItem>
-
-                <MenuItem value="admin">
-                  System Admin
-                </MenuItem>
+                <MenuItem value="receptionist">Receptionist (Front Desk)</MenuItem>
+                <MenuItem value="staff">Lab Technician</MenuItem>
+                <MenuItem value="doctor">Doctor / Pathologist</MenuItem>
+                <MenuItem value="admin">System Admin</MenuItem>
               </Select>
             </FormControl>
           </DialogContent>
@@ -586,6 +611,38 @@ export default function StaffManagement() {
             </Button>
           </DialogActions>
         </form>
+      </Dialog>
+      {/* DELETE CONFIRMATION DIALOG */}
+      <Dialog 
+        open={deleteDialogOpen} 
+        onClose={() => setDeleteDialogOpen(false)} 
+        maxWidth="xs" 
+        fullWidth
+      >
+        <DialogTitle sx={{ fontWeight: 'bold', color: '#d32f2f' }}>
+          Confirm Deletion
+        </DialogTitle>
+        <DialogContent dividers>
+          <Typography variant="body1">
+            Are you sure you want to permanently delete the account for <b>{staffToDelete?.name}</b>?
+          </Typography>
+          <Typography variant="body2" color="error" sx={{ mt: 2, fontWeight: 'bold' }}>
+            This action cannot be undone and will permanently revoke their system access.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => setDeleteDialogOpen(false)} color="inherit">
+            Cancel
+          </Button>
+          <Button 
+            onClick={confirmDelete} 
+            variant="contained" 
+            color="error" 
+            disabled={deleteLoading}
+          >
+            {deleteLoading ? 'Deleting...' : 'Delete Account'}
+          </Button>
+        </DialogActions>
       </Dialog>
       {/* 🚀 THE SUCCESS POPUP NOTIFICATION */}
       <Snackbar 

@@ -2,13 +2,15 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 const { protect } = require('../middleware/authMiddleware'); // Import the JWT gatekeeper
+const authorizeRoles = require('../middleware/roleCheck'); // 🛡️ NEW: Import the role gatekeeper
 
 /**
  * @route   GET /api/admin/bookings
  * @desc    Fetch all bookings for the lab dashboard
- * @access  Private (Requires valid JWT)
+ * @access  Private (Admin, Receptionist, Staff, Doctor)
  */
-router.get('/bookings', protect, async (req, res) => {
+// 🛡️ SECURITY: All staff types need to see the dashboard to do their jobs
+router.get('/bookings', protect, authorizeRoles('admin', 'receptionist', 'staff', 'doctor'), async (req, res) => {
   try {
     // We order by 'created_at' DESC so newest prescriptions appear first
     const queryText = `
@@ -35,9 +37,10 @@ router.get('/bookings', protect, async (req, res) => {
 /**
  * @route   PATCH /api/admin/bookings/:id/status
  * @desc    Update the lifecycle of a diagnostic test
- * @access  Private (Requires valid JWT)
+ * @access  Private (Admin, Receptionist, Staff, Doctor)
  */
-router.patch('/bookings/:id/status', protect, async (req, res) => {
+// 🛡️ SECURITY: Receptionists can update to "Scheduled/Cancelled", Techs to "Processing", Doctors to "Report Ready"
+router.patch('/bookings/:id/status', protect, authorizeRoles('admin', 'receptionist', 'staff', 'doctor'), async (req, res) => {
   const { id } = req.params;
   const { status } = req.body; 
 
@@ -70,10 +73,10 @@ router.patch('/bookings/:id/status', protect, async (req, res) => {
 /**
  * @route   PATCH /api/admin/bookings/:id/anonymize
  * @desc    Process a patient data deletion request (Soft Delete / Anonymization)
+ * @access  Private (Admin ONLY)
  */
-router.patch('/bookings/:id/anonymize', protect, async (req, res) => {
-  if (req.user.role !== 'admin') return res.status(403).json({ message: 'Unauthorized' });
-  
+// 🛡️ SECURITY: Strictly locked to 'admin'. Receptionists and Doctors CANNOT do this.
+router.patch('/bookings/:id/anonymize', protect, authorizeRoles('admin'), async (req, res) => {
   const { id } = req.params;
 
   try {

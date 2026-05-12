@@ -161,4 +161,25 @@ router.post('/add', async (req, res) => {
   }
 });
 
+// DELETE STAFF MEMBER
+router.delete('/:id', verifyToken, authorizeRoles('admin'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Check if user exists
+    const userCheck = await pool.query('SELECT * FROM staff WHERE id = $1', [id]);
+    if (userCheck.rowCount === 0) {
+      return res.status(404).json({ success: false, message: 'Staff member not found.' });
+    }
+
+    // Delete user
+    await pool.query('DELETE FROM staff WHERE id = $1', [id]);
+    
+    res.json({ success: true, message: 'Staff member deleted.' });
+  } catch (error) {
+    console.error('Delete Error:', error);
+    res.status(500).json({ success: false, message: 'Server error during deletion.' });
+  }
+});
+
 module.exports = router;
