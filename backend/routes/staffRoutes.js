@@ -2,23 +2,19 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 const { protect } = require('../middleware/authMiddleware');
+const authorizeRoles = require('../middleware/roleCheck'); // 🛡️ FIXED: Imported the RBAC middleware
 const bcrypt = require('bcrypt');
 const { validateStaffAdd, validateStaffUpdate } = require('../middleware/validator');
 const sendEmail = require('../utils/sendEmail');
 const crypto = require('crypto');
-
 
 /**
  * @route   GET /api/staff
  * @desc    Get a list of all staff members
  * @access  Private/Admin
  */
-router.get('/', protect, async (req, res) => {
-  // 🛡️ SECURITY: Only admins can view the staff directory
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Access denied.' });
-  }
-
+// 🛡️ FIXED: Used authorizeRoles to secure the route cleanly
+router.get('/', protect, authorizeRoles('admin'), async (req, res) => {
   try {
     const queryText = 'SELECT id, name, email, role, is_active, created_at FROM staff ORDER BY name ASC';
     const result = await db.query(queryText);
@@ -41,7 +37,6 @@ router.patch('/:id', protect, validateStaffUpdate, async (req, res) => {
   const { name, role, is_active } = req.body;
 
   // 🛡️ ANTI-IDOR CHECK: Verify ownership
-  // Normal staff can ONLY modify their own ID.
   if (loggedInUserRole !== 'admin' && targetId !== loggedInUserId) {
     return res.status(403).json({ message: 'Forbidden: You can only modify your own profile.' });
   }
@@ -53,7 +48,6 @@ router.patch('/:id', protect, validateStaffUpdate, async (req, res) => {
 
   try {
     // 🛡️ FIELD-LEVEL AUTHORIZATION: Filter what gets updated
-    // Normal staff cannot escalate their own role or reactivate themselves.
     const finalRole = loggedInUserRole === 'admin' && role ? role : null;
     const finalIsActive = loggedInUserRole === 'admin' && is_active !== undefined ? is_active : null;
 
@@ -68,7 +62,6 @@ router.patch('/:id', protect, validateStaffUpdate, async (req, res) => {
       RETURNING id, name, role, is_active;
     `;
     
-    // Notice how $2 and $3 will evaluate to null for normal staff, triggering COALESCE to keep the existing DB values.
     const result = await db.query(queryText, [name, finalRole, finalIsActive, targetId]);
 
     if (result.rowCount === 0) {
@@ -86,7 +79,8 @@ router.patch('/:id', protect, validateStaffUpdate, async (req, res) => {
  * @desc    Admin onboarding a new staff member
  * @access  Private/Admin
  */
-router.post('/add', async (req, res) => {
+// 🚨 CRITICAL FIX: Added `protect` and `authorizeRoles('admin')` to prevent hackers from creating accounts!
+router.post('/add', protect, authorizeRoles('admin'), async (req, res) => {
   const { name, email, password, role } = req.body;
 
   try {
@@ -103,7 +97,7 @@ router.post('/add', async (req, res) => {
     // 3. Generate a secure verification token
     const verificationToken = crypto.randomBytes(32).toString('hex');
 
-    // 4. Insert into database (defaults to is_verified = false based on our previous setup)
+    // 4. Insert into database
     const result = await db.query(
       `INSERT INTO staff (name, email, password_hash, role, verification_token, is_verified, is_active) 
        VALUES ($1, $2, $3, $4, $5, false, true) RETURNING id, name, email, role, is_active`,
@@ -112,7 +106,7 @@ router.post('/add', async (req, res) => {
 
     const newStaff = result.rows[0];
 
-    // 5. Construct the secure Vercel frontend URL
+    // 5. Construct the secure frontend URL
     const frontendUrl = process.env.FRONTEND_URL || 'https://reyanshdiagnostics.com';
     const verifyUrl = `${frontendUrl}/verify-email/${verificationToken}`;
 
@@ -138,7 +132,6 @@ router.post('/add', async (req, res) => {
         message: message,
       });
       
-      // Send success response to the frontend table
       res.status(201).json({ 
         success: true, 
         message: 'Staff added and verification email sent.',
@@ -147,7 +140,6 @@ router.post('/add', async (req, res) => {
 
     } catch (emailErr) {
       console.error('Email failed to send:', emailErr);
-      // Even if email fails, the user was created, so we return success but warn the admin
       res.status(201).json({ 
         success: true, 
         message: 'Staff added, but the verification email failed to send.',
@@ -161,19 +153,24 @@ router.post('/add', async (req, res) => {
   }
 });
 
-// DELETE STAFF MEMBER
-router.delete('/:id', verifyToken, authorizeRoles('admin'), async (req, res) => {
+/**
+ * @route   DELETE /api/staff/:id
+ * @desc    Delete a staff member
+ * @access  Private/Admin
+ */
+// 🛡️ FIXED: Replaced 'verifyToken' with 'protect', added proper imports above
+router.delete('/:id', protect, authorizeRoles('admin'), async (req, res) => {
   try {
     const { id } = req.params;
     
-    // Check if user exists
-    const userCheck = await pool.query('SELECT * FROM staff WHERE id = $1', [id]);
+    // 🛡️ FIXED: Changed 'pool.query' to 'db.query' to prevent server crash
+    const userCheck = await db.query('SELECT * FROM staff WHERE id = $1', [id]);
     if (userCheck.rowCount === 0) {
       return res.status(404).json({ success: false, message: 'Staff member not found.' });
     }
 
-    // Delete user
-    await pool.query('DELETE FROM staff WHERE id = $1', [id]);
+    // 🛡️ FIXED: Changed 'pool.query' to 'db.query'
+    await db.query('DELETE FROM staff WHERE id = $1', [id]);
     
     res.json({ success: true, message: 'Staff member deleted.' });
   } catch (error) {
