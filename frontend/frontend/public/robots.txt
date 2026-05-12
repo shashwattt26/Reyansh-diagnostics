@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.yourdomain.com/sitemap.xml
+# Tell Google where your sitemap is
+Sitemap: https://reyanshdiagnostics.com/sitemap.xml
