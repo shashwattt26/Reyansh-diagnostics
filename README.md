@@ -90,20 +90,7 @@
 
 ## 🏗️ Architecture
 
-```
-[ Patient / Browser ]  <----(HTTPS / React SPA)---->  [ Vercel CDN ]
-         |
-         | (Axios API Calls + HTTP-Only Cookies)
-         | (Socket.io WebSocket connection)
-         v
-[ Node.js + Express Backend ]  <---(Resend API)---> [ Email Delivery ]
-         |
-    (pg Pool)   
-         |
-         v
-[ PostgreSQL Database ]  <---(Upload Streams)---> [ Cloudinary Blob Storage ]
-
-```
+!System Architecture(https://github.com/shashwattt26/Reyansh-diagnostics/blob/main/diagram.png?raw=true)
 
 * **Frontend:** A React Single Page Application wrapped in a `ThemeProvider` (Material UI). Routing is handled by `react-router-dom`.
 * **Backend:** Express acts as an API gateway. Middleware chains (`protect`, `roleCheck`, `upload`) validate requests before hitting controllers.
