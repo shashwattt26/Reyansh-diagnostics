@@ -90,7 +90,7 @@
 
 ## 🏗️ Architecture
 
-```text
+```
 [ Patient / Browser ]  <----(HTTPS / React SPA)---->  [ Vercel CDN ]
          |
          | (Axios API Calls + HTTP-Only Cookies)
