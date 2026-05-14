@@ -90,7 +90,7 @@
 
 ## 🏗️ Architecture
 
-!System Architecture(https://github.com/shashwattt26/Reyansh-diagnostics/blob/main/diagram.png?raw=true)
+![System Architecture](https://github.com/shashwattt26/Reyansh-diagnostics/blob/main/diagram.png?raw=true)
 
 * **Frontend:** A React Single Page Application wrapped in a `ThemeProvider` (Material UI). Routing is handled by `react-router-dom`.
 * **Backend:** Express acts as an API gateway. Middleware chains (`protect`, `roleCheck`, `upload`) validate requests before hitting controllers.
